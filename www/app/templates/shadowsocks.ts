@@ -1,5 +1,10 @@
+import { Template } from '../../types.js'
 
-export default class Shadowsocks {
+export default class Shadowsocks implements Template {
+    type: string
+    name: string
+    description: string
+
     constructor() {
         this.type = 'shadowsocks'
         this.name = 'Shadowsocks'
@@ -7,6 +12,6 @@ export default class Shadowsocks {
     }
 
     init() {
-        
+
     }
 }
