@@ -1,4 +1,6 @@
 import { Template } from '../../types.js'
+import Settings from '../models/setting.js'
+import { v4 as uuidv4 } from 'uuid'
 
 export default class Shadowsocks implements Template {
     type: string
@@ -12,6 +14,15 @@ export default class Shadowsocks implements Template {
     }
 
     init() {
-
+        Settings.create({
+            key: 'inbounds',
+            value: [{
+                type: 'shadowsocks',
+                listen: '::',
+                method: 'aes-256-gcm',
+                listen_port: Math.floor(Math.random() * (65535 - 1024 + 1) + 1024),
+                password: uuidv4()
+            }]
+        })
     }
 }

@@ -6,6 +6,7 @@ export const useStartStore = create(
   immer((set) => ({
     type: 'newbie',
     step: 'select-user-type',
+    templateType: undefined,
     setType: (type) =>
       set((state) => {
         state.type = type
@@ -13,6 +14,10 @@ export const useStartStore = create(
     setStep: (step) =>
       set((state) => {
         state.step = step
+      }),
+    setTemplateType: (type) =>
+      set((state) => {
+        state.templateType = type
       })
   })),
 );

@@ -8,6 +8,7 @@
 |
 */
 
+import SingBoxService from '#services/singbox_service'
 import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
 
@@ -41,3 +42,9 @@ router.use([() => import('@adonisjs/core/bodyparser_middleware'), () => import('
 export const middleware = router.named({
   auth: () => import('#middleware/auth_middleware')
 })
+
+/**
+ * start sing box service
+ */
+
+new SingBoxService().start()

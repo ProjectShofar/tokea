@@ -7,13 +7,17 @@
 |
 */
 
+import ConfigsController from '#controllers/configs_controller'
 import TemplatesController from '#controllers/templates_controller'
 import router from '@adonisjs/core/services/router'
 
-router.get('/', async () => {
+router.get ('/', async () => {
   return {
     hello: 'world',
   }
 })
 
-router.get('/templates', [TemplatesController, 'getTemplates'])
+router.get ('/templates', [TemplatesController, 'getTemplates'])
+router.post('/templates/:type', [TemplatesController, 'initTemplate'])
+
+router.get ('/configs', [ConfigsController, 'getConfigs'])

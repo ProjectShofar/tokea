@@ -3,7 +3,6 @@
   "compilerOptions": {
     "rootDir": "./",
     "outDir": "./build",
-    "module": "CommonJS",
     "moduleResolution": "node16"
   }
 }
