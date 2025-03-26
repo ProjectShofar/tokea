@@ -31,7 +31,8 @@ export function ForNewbie() {
                     </div>
                 ))}
             </div>
-            <div className='mt-8 text-right'>
+            <div className='mt-8 flex justify-between'>
+                <Button loading={initTemplateLoading} type='ghost' onClick={() => initTemplate()}>返回</Button>
                 <Button loading={initTemplateLoading} icon={<IoArrowForwardSharp />} onClick={() => initTemplate()}>下一步</Button>
             </div>
         </>
