@@ -4,11 +4,13 @@ import { Button } from '../../components/Button'
 import { useStartStore } from '../../store/useStartStore'
 import { useGetTemplates, useInitTemplate } from '../../apis/template'
 import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export function ForNewbie() {
     const { type, templateType, setStep, setTemplateType } = useStartStore()
+    const navigate = useNavigate()
     const { data: templates } = useGetTemplates()
-    const { trigger: initTemplate, loading: initTemplateLoading } = useInitTemplate({ type: templateType })
+    const { trigger: initTemplate, loading: initTemplateLoading, error: initTemplateError } = useInitTemplate({ type: templateType })
     useEffect(() => {
         if (templates?.length) {
             setTemplateType(templates[0].type)
@@ -32,9 +34,15 @@ export function ForNewbie() {
                 ))}
             </div>
             <div className='mt-8 flex justify-between'>
-                <Button loading={initTemplateLoading} type='ghost' onClick={() => setStep('select-user-type')}>返回</Button>
-                <Button loading={initTemplateLoading} icon={<IoArrowForwardSharp />} onClick={() => initTemplate()}>下一步</Button>
+                <Button type='ghost' onClick={() => setStep('select-user-type')}>返回</Button>
+                <Button loading={initTemplateLoading} icon={<IoArrowForwardSharp />} onClick={async() => {
+                    await initTemplate()
+                    navigate('/')
+                }}>部署</Button>
             </div>
+            {initTemplateError && <div className='bg-red-800 text-white p-4 mt-8 rounded-lg'>
+                {initTemplateError?.message}
+            </div>}
         </>
     )
 }

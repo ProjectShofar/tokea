@@ -68,7 +68,7 @@ const useApi = () => {
       }
       throw e
     }
-  })
+  }, [])
 
   return {
     fetcher
