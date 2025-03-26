@@ -32,7 +32,7 @@ export function ForNewbie() {
                 ))}
             </div>
             <div className='mt-8 flex justify-between'>
-                <Button loading={initTemplateLoading} type='ghost' onClick={() => initTemplate()}>返回</Button>
+                <Button loading={initTemplateLoading} type='ghost' onClick={() => setStep('select-user-type')}>返回</Button>
                 <Button loading={initTemplateLoading} icon={<IoArrowForwardSharp />} onClick={() => initTemplate()}>下一步</Button>
             </div>
         </>
