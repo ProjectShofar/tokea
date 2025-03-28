@@ -3,6 +3,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import { randomUUID } from 'crypto'
 import SingBoxService from '#services/singbox_service'
+import Setting from '#models/setting'
+import TemplateService from '#services/template_service'
 
 export default class UsersController {
     async addUsers({ request }: HttpContext) {
@@ -32,5 +34,12 @@ export default class UsersController {
         await singboxService.refresh()
         await singboxService.start()
         return user
+    }
+
+    async getSubscription({ params }: HttpContext) {
+        const user = await User.query().where('uuid', params.uuid).firstOrFail()
+        const inbound = (await Setting.query().where('key', 'inbounds').first())?.value?.[0]
+        const template = await new TemplateService(inbound?.type).getInstance()
+        return await template.config(user.uuid)
     }
 }

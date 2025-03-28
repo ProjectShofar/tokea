@@ -3,4 +3,5 @@ export interface Template {
     name: string;
     description: string;
     init(): void;
+    users(): Promise<any[]>;
 }

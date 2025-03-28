@@ -27,11 +27,36 @@ export default class Shadowsocks implements Template {
         })
     }
 
-    async getUsers() {
+    async users() {
         const users = await User.all()
         return users.map(user => ({
             name: user.username,
             password: user.uuid
         }))
+    }
+
+    async config(password: string) {
+        const server = (await Settings.query().where('key', 'inbounds').first())?.value?.[0]
+        const ip = (await Settings.query().where('key', 'ip').first())?.value
+        return {
+            inbounds: [{
+                type: 'tun',
+                tag: 'tun-in',
+                address: [
+                    '172.18.0.1/30',
+                    'fdfe:dcba:9876::1/126'
+                ],
+                auto_route: true,
+                strict_route: true,
+                stack: 'mixed'
+            }],
+            outbounds: [{
+                type: 'shadowsocks',
+                server: ip,
+                server_port: server?.listen_port,
+                method: server?.method,
+                password: password
+            }]
+        }
     }
 }

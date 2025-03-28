@@ -8,7 +8,6 @@
 |
 */
 
-import SingBoxService from '#services/singbox_service'
 import router from '@adonisjs/core/services/router'
 import server from '@adonisjs/core/services/server'
 
@@ -46,5 +45,3 @@ export const middleware = router.named({
 /**
  * start sing box service
  */
-
-new SingBoxService().downloadCore()

@@ -26,3 +26,5 @@ router.get ('/configs', [ConfigsController, 'getConfigs'])
 router.post('/users', [UsersController, 'addUsers'])
 router.get ('/users', [UsersController, 'getUsers'])
 router.delete('/users/:id', [UsersController, 'deleteUser'])
+
+router.get ('/subscription/:uuid', [UsersController, 'getSubscription'])

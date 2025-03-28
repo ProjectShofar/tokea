@@ -16,7 +16,6 @@ export default class SingBoxService {
     configDir: string
     configPath: string
     binPath: string
-
     constructor() {
         this.configDir = app.makePath('tmp/singbox')
         if (!existsSync(this.configDir)) {
@@ -28,10 +27,10 @@ export default class SingBoxService {
 
     async refresh() {
         const inbounds = (await Setting.query().where('key', 'inbounds').first())?.value
-        const template = await new TemplateService(inbounds?.[0]?.type || '').getInstance()
-        const users = await template.getUsers()
+        const template = await new TemplateService(inbounds?.[0]?.type).getInstance()
+        const users = await template.users()
         const config = {
-            inbounds: inbounds?.map(inbound => {
+            inbounds: (inbounds as any[]).map(inbound => {
                 return {
                     ...inbound,
                     users
@@ -107,5 +106,6 @@ export default class SingBoxService {
             }
         })
         extract.end(tarBuffer)
+        return this
     }
 }

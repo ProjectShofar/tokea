@@ -73,6 +73,7 @@ export function UserManageCard() {
                 </div>
                 <div className='max-h-96 overflow-y-auto'>
                     {!usersLoaded && <PiSpinner className='text-primary animate-spin text-2xl mx-auto m-5' />}
+                    {!users?.length && usersLoaded && <div className='text-center text-sm opacity-70 m-5'>暂无用户，开始添加一个用户吧</div>}
                     {users?.map(user => (
                         <div key={user.uuid} className='flex items-center gap-4 p-4 border-b last:border-b-0'>
                             <div className='flex-1 flex items-center gap-4'>
