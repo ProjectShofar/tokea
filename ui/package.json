@@ -11,6 +11,8 @@
     "publish": "vite build && wangler pages deploy --branch main --project-name getshofar ./dist"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-slot": "^1.1.2",
     "@tailwindcss/vite": "^4.0.13",
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
@@ -27,6 +29,7 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.13",
     "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "^1.2.4",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useSWR from "swr";
 import { SWRConfig } from 'swr';
 import useSWRMutation from "swr/mutation";
@@ -35,11 +35,6 @@ const useApi = () => {
           const error = new Error()
           error.errors = result.errors
           error.status = response.status
-          Object.keys(error.errors)?.forEach(key => {
-            error.errors[key] = {error: {
-              message: error.errors[key][0]
-            }}
-          })
           throw error
         }
         throw new Error('未知错误');
@@ -130,6 +125,7 @@ export function useTrigger({ url, method, option = {}, query = null }) {
     }
   }
 
+
   const { data, trigger, error, isMutating, } = useSWRMutation({
     url,
     method,
@@ -139,11 +135,10 @@ export function useTrigger({ url, method, option = {}, query = null }) {
     onError: () => onLoadedHandle,
     ...option
   })
-
   return {
     data,
     trigger,
-    error,
+    error: error,
     loading: isMutating
   }
 }
