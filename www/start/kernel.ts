@@ -47,4 +47,4 @@ export const middleware = router.named({
  * start sing box service
  */
 
-new SingBoxService().start()
+new SingBoxService().downloadCore()

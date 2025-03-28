@@ -12,7 +12,7 @@ export default class Setting extends BaseModel {
     prepare: (value: object) => JSON.stringify(value),
     consume: (value: string) => JSON.parse(value),
   })
-  declare value: object
+  declare value: any[]
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

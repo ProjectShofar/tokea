@@ -6,8 +6,9 @@ import zlib from 'zlib'
 import tar from 'tar-stream'
 import axios from 'axios'
 import fs from 'fs'
-import { execSync, spawn, spawnSync } from 'child_process'
+import { spawn, spawnSync } from 'child_process'
 import logger from '@adonisjs/core/services/logger'
+import TemplateService from './template_service.js'
 
 
 export default class SingBoxService {
@@ -26,9 +27,16 @@ export default class SingBoxService {
     }
 
     async refresh() {
-        const inbounds = await Setting.query().where('key', 'inbounds').first()
+        const inbounds = (await Setting.query().where('key', 'inbounds').first())?.value
+        const template = await new TemplateService(inbounds?.[0]?.type || '').getInstance()
+        const users = await template.getUsers()
         const config = {
-            inbounds: inbounds?.value
+            inbounds: inbounds?.map(inbound => {
+                return {
+                    ...inbound,
+                    users
+                }
+            })
         }
         writeFileSync(this.configPath, JSON.stringify(config), { encoding: 'utf-8' })
         return this
@@ -52,7 +60,6 @@ export default class SingBoxService {
                 return;
             }
             await this.kill();
-            await this.downloadCore();
             const child = spawn(this.binPath, ['run', '-D', this.configDir])
             if (child.pid) {
                 fs.writeFileSync(path.join(this.configDir, 'sing-box.pid'), child.pid.toString())
@@ -63,6 +70,9 @@ export default class SingBoxService {
             child.stderr.on('data', (data) => {
                 logger.info(data.toString())
             });
+            child.on('error', (error) => {
+                throw error
+            })
             child.on('close', (code) => {
                 logger.info('child process exited', code)
                 if (code !== 0) this.start()
@@ -76,7 +86,7 @@ export default class SingBoxService {
     async downloadCore() {
         if (existsSync(this.binPath)) {
             const result = spawnSync(this.binPath, ['version'])
-            const nowVersion = result.stdout.toString('utf-8').match(/version\s+(\d+\.\d+\.\d+)/i)?.[1]
+            const nowVersion = result?.stdout?.toString('utf-8')?.match(/version\s+(\d+\.\d+\.\d+)/i)?.[1]
             if (nowVersion === this.version) return
         }
         const response =  await axios.get('https://github.com/SagerNet/sing-box/releases/download/v1.11.5/sing-box-1.11.5-darwin-arm64.tar.gz', { responseType: 'arraybuffer' })
@@ -88,6 +98,7 @@ export default class SingBoxService {
                 const writeStream = fs.createWriteStream(this.binPath);
                 stream.pipe(writeStream);
                 writeStream.on('finish', () => {
+                    fs.chmodSync(this.binPath, 0o755);
                     next()
                 });
             } else {
@@ -96,6 +107,5 @@ export default class SingBoxService {
             }
         })
         extract.end(tarBuffer)
-        execSync(`chmod +x ${this.binPath}`)
     }
 }

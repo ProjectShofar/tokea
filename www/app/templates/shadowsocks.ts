@@ -1,6 +1,7 @@
+import { randomUUID } from 'crypto'
 import { Template } from '../../types.js'
 import Settings from '../models/setting.js'
-import { v4 as uuidv4 } from 'uuid'
+import User from '#models/user'
 
 export default class Shadowsocks implements Template {
     type: string
@@ -21,8 +22,16 @@ export default class Shadowsocks implements Template {
                 listen: '::',
                 method: 'aes-256-gcm',
                 listen_port: Math.floor(Math.random() * (65535 - 1024 + 1) + 1024),
-                password: uuidv4()
+                password: randomUUID()
             }]
         })
+    }
+
+    async getUsers() {
+        const users = await User.all()
+        return users.map(user => ({
+            name: user.username,
+            password: user.uuid
+        }))
     }
 }
