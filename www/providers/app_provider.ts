@@ -2,6 +2,8 @@ import type { ApplicationService } from '@adonisjs/core/types'
 import SingBoxService from '#services/singbox_service'
 import axios from 'axios'
 import Setting from '#models/setting'
+import app from '@adonisjs/core/services/app'
+import fs from 'fs'
 export default class AppProvider {
   constructor(protected app: ApplicationService) {}
 
@@ -14,19 +16,22 @@ export default class AppProvider {
   /**
    * The container bindings have booted
    */
-  async boot() {}
+  async boot() {
+  }
 
   /**
    * The application has been booted
    */
-  async start() {}
+  async start() {
+  }
 
   /**
    * The process has been started
    */
   async ready() {
-    axios.get('https://cloudflare.com/cdn-cgi/trace')
-      .then(res => {
+    if (this.app.getEnvironment() === 'web') {
+      axios.get('https://cloudflare.com/cdn-cgi/trace')
+      .then(async res => {
         let ipv4 = '';
         let ipv6 = '';
         const regex = /^(ip|ipv6)=(.+)$/gm;
@@ -38,20 +43,21 @@ export default class AppProvider {
             ipv6 = match[2].trim();
           }
         }
-        Setting.updateOrCreate({
+        await Setting.updateOrCreate({
           key: 'ip'
         }, {
           value: ipv4
         })
-        Setting.updateOrCreate({
+        await Setting.updateOrCreate({
           key: 'ipv6'
         }, {
           value: ipv6
         })
       })
-    const singboxService = new SingBoxService()
-    await singboxService.downloadCore()
-    await singboxService.start()
+      const singboxService = new SingBoxService()
+      await singboxService.downloadCore()
+      await singboxService.start()
+    }
   }
 
   /**
