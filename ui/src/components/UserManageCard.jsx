@@ -26,7 +26,10 @@ export function UserManageCard() {
     return (
         <div className='bg-white rounded-lg pt-4 mb-4'>
             <div className='flex items-center justify-between px-4'>
-                <div>用户管理</div>
+                <div>
+                    <div className='text-md'>用户管理</div>
+                    <div className='text-xs opacity-50'>管理列表中的用户连接到Tokea</div>
+                </div>
                 <div className='flex items-center gap-2'>
                     <Input className='h-8' placeholder='搜索用户' />
                     <Dialog open={open} onOpenChange={setOpen}>
