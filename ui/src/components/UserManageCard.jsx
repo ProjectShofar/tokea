@@ -16,6 +16,7 @@ import { useAddUsers, useDeleteUser } from "../apis/user"
 import { PiSpinner } from "react-icons/pi"
 import { Form } from "@/components/ui/form"
 import { useGetUsers } from "../apis/user"
+import { Modal } from "./Modal"
 
 export function UserManageCard() {
     const { trigger: addUsers, loading: addUsersLoading, error: addUsersError } = useAddUsers()
@@ -32,17 +33,12 @@ export function UserManageCard() {
                 </div>
                 <div className='flex items-center gap-2 mt-4 md:mt-0'>
                     <Input className='h-8' placeholder='搜索用户' />
-                    <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogTrigger asChild>
-                            <Button size='sm'>添加用户 <IoAddCircleOutline /></Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>添加新用户</DialogTitle>
-                                <DialogDescription>
-                                    添加用户并分享给朋友们，让他们也能享受到翻墙的乐趣。
-                                </DialogDescription>
-                            </DialogHeader>
+                    <Modal
+                        open={open}
+                        onOpenChange={setOpen}
+                        title='添加新用户'
+                        description='添加用户并分享给朋友们，让他们也能享受到翻墙的乐趣。'
+                        content={
                             <Form
                                 onSubmit={async v => {
                                     await addUsers(v)
@@ -61,8 +57,10 @@ export function UserManageCard() {
                                 submitText="添加"
                                 errors={addUsersError?.errors}
                             />
-                        </DialogContent>
-                    </Dialog>
+                        }
+                    >
+                        <Button size='sm' onClick={() => setOpen(true)}>添加用户 <IoAddCircleOutline /></Button>
+                    </Modal>
                 </div>
             </div>
             <div className='mt-4'>
@@ -91,14 +89,12 @@ export function UserManageCard() {
                     ))}
                 </div>
             </div>
-            <Dialog open={!!preDeleteUser} onOpenChange={() => setPreDeleteUser(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>删除用户</DialogTitle>
-                        <DialogDescription>
-                            确定要删除 {preDeleteUser?.username} 吗？
-                        </DialogDescription>
-                    </DialogHeader>
+            <Modal
+                title='删除用户'
+                description={`确定要删除 ${preDeleteUser?.username} 吗？`}
+                open={!!preDeleteUser}
+                onOpenChange={() => setPreDeleteUser(null)}
+                content={
                     <div className='flex gap-2 justify-end'>
                         <Button variant='outline' onClick={() => setPreDeleteUser(null)}>取消</Button>
                         <Button variant='destructive' onClick={async () => {
@@ -107,8 +103,8 @@ export function UserManageCard() {
                             setPreDeleteUser(null)
                         }}>确定 {deleteUsersLoading && <PiSpinner className='animate-spin' />}</Button>
                     </div>
-                </DialogContent>
-            </Dialog>
+                }
+            />
         </div>
     )
 }
