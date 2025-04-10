@@ -25,12 +25,12 @@ export function UserManageCard() {
     const { trigger: deleteUser, loading: deleteUsersLoading, error: deleteUsersError } = useDeleteUser({ id: preDeleteUser?.id })
     return (
         <div className='bg-white rounded-lg pt-4 mb-4'>
-            <div className='flex items-center justify-between px-4'>
+            <div className='md:flex items-center justify-between px-4'>
                 <div>
                     <div className='text-md'>用户管理</div>
                     <div className='text-xs opacity-50'>管理列表中的用户连接到Tokea</div>
                 </div>
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center gap-2 mt-4 md:mt-0'>
                     <Input className='h-8' placeholder='搜索用户' />
                     <Dialog open={open} onOpenChange={setOpen}>
                         <DialogTrigger asChild>
@@ -84,7 +84,7 @@ export function UserManageCard() {
                                 {user.username}
                             </div>
                             <div className="flex gap-2">
-                                <Button size='sm' variant='outline'><IoQrCode /></Button>
+                                <Button size='sm' variant='outline'><IoQrCode /> 连接码</Button>
                                 <Button size='sm' variant='destructive' onClick={() => setPreDeleteUser(user)}><IoTrashBin /></Button>
                             </div>
                         </div>
