@@ -22,7 +22,7 @@ router.get ('/templates', [TemplatesController, 'getTemplates'])
 router.post('/templates/:type', [TemplatesController, 'initTemplate'])
 
 router.get ('/configs', [ConfigsController, 'getConfigs'])
-
+router.post('/configs/reload', [ConfigsController, 'reload'])
 router.post('/users', [UsersController, 'addUsers'])
 router.get ('/users', [UsersController, 'getUsers'])
 router.delete('/users/:id', [UsersController, 'deleteUser'])

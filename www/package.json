@@ -61,6 +61,7 @@
     "better-sqlite3": "^11.9.1",
     "luxon": "^3.5.0",
     "reflect-metadata": "^0.2.2",
+    "socket.io": "^4.8.1",
     "tar-stream": "^3.1.7"
   },
   "hotHook": {

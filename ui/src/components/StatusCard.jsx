@@ -1,18 +1,22 @@
 import { IoReload, IoArrowUp, IoArrowDown, IoPerson, IoSpeedometer, IoWifi } from "react-icons/io5";
-import { useGetConfigs } from "@/apis/config";
+import { useGetConfigs, useReloadConfigs } from "@/apis/config";
 export function StatusCard() {
-    const { data: config } = useGetConfigs()
+    const { data: config, refresh } = useGetConfigs()
+    const { trigger: reloadConfigs, loading: reloading } = useReloadConfigs()
     return (
         <div className='grid grid-cols-3 gap-4'>
             <div className='bg-primary rounded-lg p-4 col-span-3 h-[200px] md:h-full md:col-span-1 relative'>
                 <div className="grid grid-cols-2">
                     <div className='absolute bottom-5'>
                         <div className='text-white opacity-50'>状态</div>
-                        <div className='text-white text-3xl'>运行中</div>
+                        <div className='text-white text-3xl'>{config?.running ? '运行中' : '未运行'}</div>
                     </div>
                     <div className='absolute top-4 right-4'>
-                        <button title='重启' className='flex items-center gap-2 cursor-pointer hover:bg-white/10 transition-colors duration-200 text-white text-md px-3 py-1 rounded-full border border-white/30'>
-                            <IoReload /> 重启
+                        <button disabled={reloading} onClick={async () => {
+                            await reloadConfigs()
+                            refresh()
+                        }} title='重启' className='flex items-center gap-2 cursor-pointer hover:bg-white/10 transition-colors duration-200 text-white text-md px-3 py-1 rounded-full border border-white/30'>
+                            <IoReload className={reloading ? 'animate-spin' : ''} /> 重启
                         </button>
                     </div>
                 </div>

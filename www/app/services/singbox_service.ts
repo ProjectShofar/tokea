@@ -33,12 +33,30 @@ export default class SingBoxService {
             inbounds: (inbounds as any[]).map(inbound => {
                 return {
                     ...inbound,
-                    users
+                    users,
                 }
-            })
+            }),
+            experimental: {
+                clash_api: {
+                    external_controller: '127.0.0.1:9098',
+                }
+            }
         }
         writeFileSync(this.configPath, JSON.stringify(config), { encoding: 'utf-8' })
         return this
+    }
+
+    async isRunning() {
+        try {
+            const pid = parseInt(fs.readFileSync(path.join(this.configDir, 'sing-box.pid'), 'utf-8'))
+            process.kill(pid, 0)
+            return true
+        } catch (e) {
+            console.log(e.code)
+            if (e.code === 'ESRCH') {
+                return false
+            }
+        }
     }
 
     async kill() {
