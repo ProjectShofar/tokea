@@ -6,7 +6,7 @@ export default class Setting extends BaseModel {
   declare id: number
 
   @column()
-  declare key: string
+  declare key: 'inbounds' | 'ip' | 'ipv6'
 
   @column({
     prepare: (value: object) => JSON.stringify(value),

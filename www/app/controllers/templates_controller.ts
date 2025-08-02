@@ -14,7 +14,9 @@ export default class TemplatesController {
         const transaction = await db.transaction()
         try {
             if (await Setting.query({ client: transaction }).forUpdate().where('key', 'inbounds').first()) {
-                throw new Error('Template already initialized')
+                return {
+                    success: true,
+                }
             }
             instance.init()
             await transaction.commit()
