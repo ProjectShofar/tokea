@@ -4,19 +4,17 @@ import SingBoxService from '#services/singbox_service'
 import axios from 'axios'
 import Setting from '#models/setting'
 import app from '@adonisjs/core/services/app'
+import https from 'https'
 
 if (app.getEnvironment() === 'web') {
-  axios.get('https://cloudflare.com/cdn-cgi/trace')
+  axios.get('https://cloudflare.com/cdn-cgi/trace', { httpsAgent: new https.Agent({ family: 4 })})
   .then(async res => {
     let ipv4 = '';
-    let ipv6 = '';
-    const regex = /^(ip|ipv6)=(.+)$/gm;
+    const regex = /^(ip)=(.+)$/gm;
     let match;
     while ((match = regex.exec(res.data)) !== null) {
       if (match[1] === 'ip') {
         ipv4 = match[2].trim();
-      } else if (match[1] === 'ipv6') {
-        ipv6 = match[2].trim();
       }
     }
     await Setting.updateOrCreate({
@@ -24,6 +22,17 @@ if (app.getEnvironment() === 'web') {
     }, {
       value: ipv4
     })
+  })
+  axios.get('https://cloudflare.com/cdn-cgi/trace', { httpsAgent: new https.Agent({ family: 6 })})
+  .then(async res => {
+    let ipv6 = '';
+    const regex = /^(ip)=(.+)$/gm;
+    let match;
+    while ((match = regex.exec(res.data)) !== null) {
+      if (match[1] === 'ip') {
+        ipv6 = match[2].trim();
+      }
+    }
     await Setting.updateOrCreate({
       key: 'ipv6'
     }, {
