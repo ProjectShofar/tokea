@@ -81,6 +81,14 @@ export default defineConfig({
   {
     pattern: 'resources/views/**/*.edge',
     reloadServer: false,
-  }
+  },
+  {
+    pattern: 'app/templates/**',
+    reloadServer: false,
+  },
+  {
+    pattern: '.env.example',
+    reloadServer: false,
+  },
   ]
 })
