@@ -17,7 +17,7 @@ if [ ! -f ".env" ]; then
     
     # Run fresh migrations
     echo "🗄️ Running fresh migrations..."
-    node ace migration:fresh
+    node ace migration:fresh --force
     
     echo "🚀 Setup completed successfully!"
 else
