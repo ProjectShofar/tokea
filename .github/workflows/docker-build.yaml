@@ -39,8 +39,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
-        context: ./www
-        file: Dockerfile
+        context: .
         push: true
         platforms: linux/amd64,linux/arm64
         tags: |
