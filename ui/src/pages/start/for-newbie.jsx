@@ -11,7 +11,7 @@ export function ForNewbie() {
     const { type, templateType, setStep, setTemplateType } = useStartStore()
     const navigate = useNavigate()
     const { data: templates } = useGetTemplates()
-    const { trigger: initTemplate, loading: initTemplateLoading, error: initTemplateError } = useInitTemplate({ type: templateType })
+    const { trigger: initTemplate, loading: initTemplateLoading, error: initTemplateError } = useInitTemplate()
     useEffect(() => {
         if (templates?.length) {
             setTemplateType(templates[0].type)
@@ -35,9 +35,9 @@ export function ForNewbie() {
                 ))}
             </div>
             <div className='mt-8 flex justify-between'>
-                <Button variant='outline' onClick={() => setStep('select-user-type')}>返回</Button>
-                <Button disabled={initTemplateLoading} onClick={async() => {
-                    await initTemplate()
+                <Button variant='outline' className='cursor-pointer' onClick={() => setStep('select-user-type')}>返回</Button>
+                <Button disabled={initTemplateLoading} className='cursor-pointer' onClick={async() => {
+                    await initTemplate({ type: templateType })
                     navigate('/')
                 }}>部署 {initTemplateLoading ? <PiSpinnerGap className='animate-spin' /> : <IoArrowForwardSharp />}</Button>
             </div>

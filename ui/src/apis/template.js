@@ -6,9 +6,16 @@ export function useGetTemplates() {
     });
 }
 
-export function useInitTemplate({ type }) {
+export function useInitTemplate() {
     return useTrigger({
-        url: `/templates/${type}`,
+        url: `/templates/init`,
+        method: 'POST'
+    })
+}
+
+export function useCreateTemplate() {
+    return useTrigger({
+        url: `/templates/create`,
         method: 'POST'
     })
 }

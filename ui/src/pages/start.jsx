@@ -2,14 +2,23 @@ import {SelectUserType} from './start/select-user-type'
 import { useStartStore } from '../store/useStartStore'
 import {ForNewbie} from './start/for-newbie'
 import {ForExpert} from './start/for-expert'
-
+import { useGetConfigs } from '../apis/config'
+import { Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
 export default function Start()
 {
-    const { step } = useStartStore()
+    const { step, setStep } = useStartStore()
+    const { data: config } = useGetConfigs()
+    useEffect(() => {
+        setStep('select-user-type')
+    }, [])
     const steps = {
         'select-user-type': <SelectUserType />,
         'for-newbie': <ForNewbie />,
         'for-expert': <ForExpert />,
+    }
+    if (config?.inited) {
+        return <Navigate to='/' />
     }
     return (
         <div className='max-w-2xl mx-auto'>

@@ -1,7 +1,7 @@
+
 export interface Template {
-    type: string;
-    name: string;
-    description: string;
-    init(): void;
-    users(): Promise<any[]>;
+    name: string
+    description: string
+    server: any
+    client: any
 }

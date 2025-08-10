@@ -29,7 +29,7 @@ export function SelectUserType() {
                 </div>
             </div>
             <div className='mt-8 text-right'>
-                <Button onClick={() => setStep(`for-${type}`)}>下一步 <IoArrowForwardSharp /></Button>
+                <Button className='cursor-pointer' onClick={() => setStep(`for-${type}`)}>下一步 <IoArrowForwardSharp /></Button>
             </div>
         </>
     )

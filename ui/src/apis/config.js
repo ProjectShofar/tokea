@@ -12,3 +12,17 @@ export function useReloadConfigs() {
         method: 'POST'
     });
 }
+
+export function useResetConfigs() {
+    return useTrigger({
+        url: '/configs/reset',
+        method: 'POST'
+    });
+}
+
+export function useSetTitle() {
+    return useTrigger({
+        url: '/configs/title',
+        method: 'POST'
+    });
+}

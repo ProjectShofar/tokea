@@ -1,25 +1,27 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
-import type { Authenticators } from '@adonisjs/auth/types'
+import Setting from '#models/setting'
 
-/**
- * Auth middleware is used authenticate HTTP requests and deny
- * access to unauthenticated users.
- */
 export default class AuthMiddleware {
-  /**
-   * The URL to redirect to, when authentication fails
-   */
-  redirectTo = '/login'
+  async handle(ctx: HttpContext, next: NextFn) {
+    /**
+     * Middleware logic goes here (before the next call)
+     */
 
-  async handle(
-    ctx: HttpContext,
-    next: NextFn,
-    options: {
-      guards?: (keyof Authenticators)[]
-    } = {}
-  ) {
-    await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo })
-    return next()
+    /**
+     * Call next method in the pipeline and return its output
+     */
+    if (await Setting.findBy('key', 'username')) {
+      const authorization = ctx.request.header('Authorization')
+      if (!authorization) {
+        return ctx.response.header('WWW-Authenticate', 'Basic realm="Protected"').unauthorized({ message: 'Unauthorized' })
+      }
+      const [username, password] = Buffer.from(authorization?.split(' ')?.[1], 'base64').toString().split(':')
+      if ((username !== (await Setting.findBy('key', 'username'))?.value) || (password !== (await Setting.findBy('key', 'password'))?.value)) {
+        return ctx.response.header('WWW-Authenticate', 'Basic realm="Protected"').unauthorized({ message: 'Unauthorized' })
+      }
+    }
+    const output = await next()
+    return output
   }
 }

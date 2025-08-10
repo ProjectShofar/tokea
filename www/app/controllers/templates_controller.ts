@@ -1,33 +1,50 @@
 import Setting from '#models/setting'
-import SingBoxService from '#services/singbox_service'
+import CoreService from '#services/core_service'
 import TemplateService from '#services/template_service'
-import type { HttpContext } from '@adonisjs/core/http'
-
-import db from '@adonisjs/lucid/services/db'
+import { HttpContext } from '@adonisjs/core/http'
+import { inject } from '@adonisjs/core/container'
+import fs from 'fs'
+import path from 'path'
+import app from '@adonisjs/core/services/app'
+@inject()
 export default class TemplatesController {
+    constructor(private coreService: CoreService) {}
     async getTemplates() {
         return await TemplateService.getTemplates()
     }
 
+    async createTemplate(ctx: HttpContext) {
+        const { data } = ctx.request.body()
+        const template = JSON.parse(data)
+        if (!template.server || !template.client) {
+            throw new Error('Invalid template')
+        }
+
+        const templateName = `custom-${Date.now()}`
+        if (!fs.existsSync(app.makePath('tmp/templates'))) {
+            fs.mkdirSync(app.makePath('tmp/templates'), { recursive: true })
+        }
+        fs.writeFileSync(path.join(app.makePath('tmp/templates'), `${templateName}.json`), data)
+        ctx.request.updateBody({ type: templateName })
+        return await this.initTemplate(ctx)
+    }
+
     async initTemplate({ request }: HttpContext) {
-        const instance = await new TemplateService(request.param('type')).getInstance()
-        const transaction = await db.transaction()
         try {
-            if (await Setting.query({ client: transaction }).forUpdate().where('key', 'inbounds').first()) {
+            if (await Setting.findBy('key', 'server')) {
                 return {
                     success: true,
                 }
             }
-            instance.init()
-            await transaction.commit()
-            const singboxService = new SingBoxService()
-            await singboxService.refresh()
-            await singboxService.start()
+            await new TemplateService(request.input('type')).init()
+            await this.coreService.refresh()
+            await this.coreService.start()
             return {
                 success: true
             }
         } catch (e) {
-            await transaction.rollback()
+            console.log(e)
+            await Setting.truncate()
             throw e
         }
     }

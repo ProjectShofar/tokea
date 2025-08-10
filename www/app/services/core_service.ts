@@ -11,7 +11,7 @@ import logger from '@adonisjs/core/services/logger'
 import TemplateService from './template_service.js'
 
 
-export default class SingBoxService {
+export default class CoreService {
     version: string = '1.11.5'
     configDir: string
     configPath: string
@@ -26,16 +26,16 @@ export default class SingBoxService {
     }
 
     async refresh() {
-        const inbounds = (await Setting.query().where('key', 'inbounds').first())?.value
-        const template = await new TemplateService(inbounds?.[0]?.type).getInstance()
-        const users = await template.users()
+        const server = (await Setting.query().where('key', 'server').first())?.value
+        const template = (await Setting.query().where('key', 'template').first())?.value
+        const users = await new TemplateService(template).buildUsers()
         const config = {
-            inbounds: (inbounds as any[]).map(inbound => {
-                return {
-                    ...inbound,
+            inbounds: [
+                {
+                    ...server,
                     users,
                 }
-            }),
+            ],
             experimental: {
                 clash_api: {
                     external_controller: '127.0.0.1:9098',
@@ -65,8 +65,8 @@ export default class SingBoxService {
             if (pid) {
                 process.kill(pid, 'SIGTERM')
                 fs.unlinkSync(path.join(this.configDir, 'sing-box.pid'))
-                return
             }
+            await new Promise(resolve => setTimeout(resolve, 1000))
         } catch (e) {}
     }
 
@@ -94,6 +94,7 @@ export default class SingBoxService {
                 logger.info('child process exited', code)
                 if (code !== 0) this.start()
             });
+            await new Promise(resolve => setTimeout(resolve, 1000))
         } catch (e) {
             logger.error(e)
             throw e

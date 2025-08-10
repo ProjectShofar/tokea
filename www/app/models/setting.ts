@@ -6,13 +6,13 @@ export default class Setting extends BaseModel {
   declare id: number
 
   @column()
-  declare key: 'inbounds' | 'ip' | 'ipv6'
+  declare key: 'server' | 'ip' | 'ipv6' | 'inited' | 'template' | 'title'
 
   @column({
     prepare: (value: object) => JSON.stringify(value),
     consume: (value: string) => JSON.parse(value),
   })
-  declare value: any[] | string
+  declare value: any
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

@@ -5,7 +5,7 @@ import './styles/tailwind.css'
 import { setConfig } from './utils/fetcher.js'
 
 setConfig({
-  api: 'http://localhost:4444'
+  api: import.meta.env.DEV ? 'http://localhost:4444' : window.location.origin
 })
 
 createRoot(document.getElementById('root')).render(

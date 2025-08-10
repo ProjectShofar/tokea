@@ -2,11 +2,13 @@ import User from '#models/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import { randomUUID } from 'crypto'
-import SingBoxService from '#services/singbox_service'
+import CoreService from '#services/core_service'
 import Setting from '#models/setting'
 import TemplateService from '#services/template_service'
-
+import { inject } from '@adonisjs/core/container'
+@inject()
 export default class UsersController {
+    constructor(private coreService: CoreService) {}
     async addUsers({ request }: HttpContext) {
         const payload = await request.validateUsing(vine.compile(vine.object({
             username: vine.string().trim().unique(async (db, value, field) => {
@@ -17,9 +19,8 @@ export default class UsersController {
             username: payload.username,
             uuid: randomUUID()
         })
-        const singboxService = new SingBoxService()
-        await singboxService.refresh()
-        await singboxService.start()
+        await this.coreService.refresh()
+        await this.coreService.start()
         return user
     }
 
@@ -30,9 +31,8 @@ export default class UsersController {
     async deleteUser({ params }: HttpContext) {
         const user = await User.findOrFail(params.id)
         await user.delete()
-        const singboxService = new SingBoxService()
-        await singboxService.refresh()
-        await singboxService.start()
+        await this.coreService.refresh()
+        await this.coreService.start()
         return user
     }
 

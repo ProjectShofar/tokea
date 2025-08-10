@@ -59,7 +59,7 @@ export function UserManageCard() {
                             />
                         }
                     >
-                        <Button size='sm' onClick={() => setOpen(true)}>添加用户 <IoAddCircleOutline /></Button>
+                        <Button className='cursor-pointer' size='sm' onClick={() => setOpen(true)}>添加用户 <IoAddCircleOutline /></Button>
                     </Modal>
                 </div>
             </div>
