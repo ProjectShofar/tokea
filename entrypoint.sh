@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Check if .env file exists
 if [ ! -f ".env" ]; then
