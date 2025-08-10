@@ -28,7 +28,7 @@ router.group(() => {
   router.get ('/users', [UsersController, 'getUsers'])
   router.delete('/users/:id', [UsersController, 'deleteUser'])
 
-  router.get ('/subscription/:uuid', [UsersController, 'getSubscription'])
+  // router.get ('/subscription/:uuid', [UsersController, 'getSubscription'])
 }).use([
   middleware.auth()
 ])
