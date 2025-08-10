@@ -20,6 +20,7 @@ jobs:
 
     - name: Install dependencies and build
       run: |
+        cd www
         npm install
         npm run build
 
