@@ -6,6 +6,11 @@ if [ ! -f ".env" ]; then
     cp .env.example .env
     echo "✅ .env file created successfully"
     
+    # Change NODE_ENV from development to production
+    echo "🔧 Setting NODE_ENV to production..."
+    sed -i 's/NODE_ENV=development/NODE_ENV=production/g' .env
+    echo "✅ Environment set to production"
+    
     # Generate application key
     echo "🔑 Generating application key..."
     node ace generate:key
@@ -17,6 +22,6 @@ if [ ! -f ".env" ]; then
     echo "🚀 Setup completed successfully!"
 else
     echo "✅ .env file already exists, skipping setup commands"
-fi 
+fi
 
 node bin/server.js
