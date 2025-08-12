@@ -7,6 +7,7 @@ import https from 'https'
 import { Template } from '../../types.js'
 import { randomUUID } from 'crypto'
 import User from '#models/user'
+import logger from '@adonisjs/core/services/logger'
 export default class TemplateService {
     templateName: string
     template: Template
@@ -18,7 +19,8 @@ export default class TemplateService {
     }
 
     async init() {
-      await this.getIP()
+      await this.getIPv4()
+      await this.getIPv6()
       await Setting.updateOrCreate({
         key: 'server'
       }, {
@@ -42,39 +44,43 @@ export default class TemplateService {
       return this
     }
 
-    async getIP() {
-      axios.get('https://cloudflare.com/cdn-cgi/trace', { httpsAgent: new https.Agent({ family: 4 })})
-      .then(async res => {
-        let ipv4 = '';
+    async getIPv4() {
+      try {
+        const res = await axios.get('https://cloudflare.com/cdn-cgi/trace', { httpsAgent: new https.Agent({ family: 4 })})
         const regex = /^(ip)=(.+)$/gm;
         let match;
         while ((match = regex.exec(res.data)) !== null) {
           if (match[1] === 'ip') {
-            ipv4 = match[2].trim();
+            await Setting.updateOrCreate({
+              key: 'ip'
+            }, {
+              value: match[2].trim()
+            })
           }
         }
-        await Setting.updateOrCreate({
-          key: 'ip'
-        }, {
-          value: ipv4
-        })
-      })
-      axios.get('https://cloudflare.com/cdn-cgi/trace', { httpsAgent: new https.Agent({ family: 6 })})
-      .then(async res => {
-        let ipv6 = '';
+      } catch (e) {
+        logger.error(e.message)
+      }
+    }
+
+
+    async getIPv6() {
+      try {
+        const res = await axios.get('https://cloudflare.com/cdn-cgi/trace', { httpsAgent: new https.Agent({ family: 6 })})
         const regex = /^(ip)=(.+)$/gm;
         let match;
         while ((match = regex.exec(res.data)) !== null) {
           if (match[1] === 'ip') {
-            ipv6 = match[2].trim();
+            await Setting.updateOrCreate({
+              key: 'ipv6'
+            }, {
+              value: match[2].trim()
+            })
           }
         }
-        await Setting.updateOrCreate({
-          key: 'ipv6'
-        }, {
-          value: ipv6
-        })
-      })
+      } catch (e) {
+        logger.error(e.message)
+      }
     }
 
     getTemplate() {

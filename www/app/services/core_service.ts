@@ -9,6 +9,7 @@ import fs from 'fs'
 import { spawn, spawnSync } from 'child_process'
 import logger from '@adonisjs/core/services/logger'
 import TemplateService from './template_service.js'
+import os from 'os'
 
 
 export default class CoreService {
@@ -102,12 +103,13 @@ export default class CoreService {
     }
 
     async downloadCore() {
+        logger.info(`downloadCore ${this.version} ${os.platform()} ${os.arch()}`)
         if (existsSync(this.binPath)) {
             const result = spawnSync(this.binPath, ['version'])
             const nowVersion = result?.stdout?.toString('utf-8')?.match(/version\s+(\d+\.\d+\.\d+)/i)?.[1]
             if (nowVersion === this.version) return
         }
-        const response =  await axios.get('https://github.com/SagerNet/sing-box/releases/download/v1.11.5/sing-box-1.11.5-darwin-arm64.tar.gz', { responseType: 'arraybuffer' })
+        const response =  await axios.get(`https://github.com/SagerNet/sing-box/releases/download/v1.11.5/sing-box-1.11.5-${os.platform()}-${os.arch()}.tar.gz`, { responseType: 'arraybuffer' })
         const compressedBuffer = Buffer.from(response.data)
         const tarBuffer = zlib.gunzipSync(compressedBuffer)
         const extract = tar.extract()
@@ -125,6 +127,7 @@ export default class CoreService {
             }
         })
         extract.end(tarBuffer)
+        logger.info(`downloadCore ${this.version} ${os.platform()} ${os.arch()} success`)
         return this
     }
 }
