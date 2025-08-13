@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Check if .env file exists
-if [ ! -f ".env" ]; then
+if [ ! -f "./tmp/db.sqlite3" ]; then
     echo "📋 .env file not found, copying from .env.example..."
     cp .env.example .env
     echo "✅ .env file created successfully"
