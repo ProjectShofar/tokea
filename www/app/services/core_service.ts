@@ -109,7 +109,11 @@ export default class CoreService {
             const nowVersion = result?.stdout?.toString('utf-8')?.match(/version\s+(\d+\.\d+\.\d+)/i)?.[1]
             if (nowVersion === this.version) return
         }
-        const response =  await axios.get(`https://github.com/SagerNet/sing-box/releases/download/v1.11.5/sing-box-1.11.5-${os.platform()}-${os.arch()}.tar.gz`, { responseType: 'arraybuffer' })
+        const archMap: Record<string, string> = {
+            'x64': 'amd64',
+        }
+        const arch = archMap[os.arch()] || os.arch()
+        const response =  await axios.get(`https://github.com/SagerNet/sing-box/releases/download/v1.11.5/sing-box-1.11.5-${os.platform()}-${arch}.tar.gz`, { responseType: 'arraybuffer' })
         const compressedBuffer = Buffer.from(response.data)
         const tarBuffer = zlib.gunzipSync(compressedBuffer)
         const extract = tar.extract()
