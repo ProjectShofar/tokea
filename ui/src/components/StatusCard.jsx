@@ -1,8 +1,27 @@
-import { IoReload, IoArrowUp, IoArrowDown, IoPerson, IoSpeedometer, IoWifi } from "react-icons/io5";
+import { IoReload, IoArrowUp, IoArrowDown, IoSpeedometer, IoWifi } from "react-icons/io5";
 import { useGetConfigs, useReloadConfigs } from "@/apis/config";
+import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 export function StatusCard() {
     const { data: config, refresh } = useGetConfigs()
     const { trigger: reloadConfigs, loading: reloading } = useReloadConfigs()
+    const [speed, setSpeed] = useState({
+        up: 0,
+        down: 0
+    })
+    const [traffic, setTraffic] = useState(0)
+    useEffect(() => {
+        const socket = io(`ws://localhost:4444`)
+        socket.on('speed', (data) => {
+            setSpeed(data)
+        })
+        socket.on('traffic', (data) => {
+            setTraffic((data.up + data.down) / 1024 / 1024 / 1024)
+        })
+        return () => {
+            socket.disconnect()
+        }
+    }, [])
     return (
         <div className='grid grid-cols-3 gap-4'>
             <div className='bg-primary rounded-lg p-4 col-span-3 h-[200px] md:h-full md:col-span-1 relative'>
@@ -27,7 +46,7 @@ export function StatusCard() {
                         <div className='border-r last:border-0 border-gray-200 p-4 flex items-start justify-between'>
                             <div>
                                 <div className='opacity-50 text-sm'>上行</div>
-                                <div className='text-lg'>0 Mbps</div>
+                                <div className='text-lg'>{speed.up.toFixed(2)} Mbps</div>
                             </div>
                             <div className='text-2xl'>
                                 <IoArrowUp className='rotate-45' />
@@ -36,7 +55,7 @@ export function StatusCard() {
                         <div className='border-r last:border-0 border-gray-200 p-4 flex items-start justify-between'>
                             <div>
                                 <div className='opacity-50 text-sm'>下行</div>
-                                <div className='text-lg'>0 Mbps</div>
+                                <div className='text-lg'>{speed.down.toFixed(2)} Mbps</div>
                             </div>
                             <div className='text-2xl'>
                                 <IoArrowDown className='rotate-315' />
@@ -56,7 +75,7 @@ export function StatusCard() {
                         <div className='border-r last:border-0 border-gray-200 p-4 flex items-start justify-between'>
                             <div>
                                 <div className='opacity-50 text-sm'>累计流量</div>
-                                <div className='text-lg'>0 GB</div>
+                                <div className='text-lg'>{traffic.toFixed(2)} GB</div>
                             </div>
                             <div className='text-2xl'>
                                 <IoSpeedometer />

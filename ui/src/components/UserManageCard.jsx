@@ -37,7 +37,7 @@ export function UserManageCard() {
                         open={open}
                         onOpenChange={setOpen}
                         title='添加新用户'
-                        description='添加用户并分享给朋友们，让他们也能享受到翻墙的乐趣。'
+                        description='添加用户并分享给朋友们，让TA们也能享受到翻墙的乐趣。'
                         content={
                             <Form
                                 onSubmit={async v => {
