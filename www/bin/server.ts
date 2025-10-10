@@ -33,7 +33,7 @@ const IMPORTER = (filePath: string) => {
   return import(filePath)
 }
 
-const ignitor = new Ignitor(APP_ROOT, { importer: IMPORTER })
+new Ignitor(APP_ROOT, { importer: IMPORTER })
   .tap((app) => {
     app.booting(async () => {
       await import('#start/env')
@@ -44,17 +44,12 @@ const ignitor = new Ignitor(APP_ROOT, { importer: IMPORTER })
     app.listen('SIGTERM', () => app.terminate())
     app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
   })
-
-const certPath = path.join(new URL('.', APP_ROOT).pathname, 'tmp', 'certificate.crt')
-const keyPath = path.join(new URL('.', APP_ROOT).pathname, 'tmp', 'private.key')
-const useHttps = process.env.ZEROSSL_API_KEY && fs.existsSync(certPath) && fs.existsSync(keyPath)
-
-
-if (useHttps) {
-  console.log('Using HTTPS with ZeroSSL certificate')
-  ignitor
-    .httpServer()
-    .start((handler) => {
+  .httpServer()
+  .start((handler) => {
+    const certPath = path.join(new URL('.', APP_ROOT).pathname, 'tmp', 'certificate.crt')
+    const keyPath = path.join(new URL('.', APP_ROOT).pathname, 'tmp', 'private.key')
+    const useHttps = process.env.ZEROSSL_API_KEY && fs.existsSync(certPath) && fs.existsSync(keyPath)
+    if (useHttps) {
       return https.createServer(
         {
           cert: fs.readFileSync(certPath, 'utf-8'),
@@ -62,22 +57,13 @@ if (useHttps) {
         },
         handler
       )
-    })
-    .catch((error: any) => {
-      process.exitCode = 1
-      prettyPrintError(error)
-    })
-} else {
-  ignitor
-    .httpServer()
-    .start(handler => {
-      if (process.env.ZEROSSL_API_KEY && !useHttps) {
-        throw new Error('SSL certificate application failed. If you want to run it under http, please remove ZEROSSL_API_KEY. Please note: running it under http will cause security issues and your content may be stolen by a man-in-the-middle.')
-      }
-      return http.createServer(handler)
-    })
-    .catch((error: any) => {
-      process.exitCode = 1
-      prettyPrintError(error)
-    })
-}
+    }
+    if (process.env.ZEROSSL_API_KEY && !useHttps) {
+      throw new Error('SSL certificate application failed. If you want to run it under http, please remove ZEROSSL_API_KEY. Please note: running it under http will cause security issues and your content may be stolen by a man-in-the-middle.')
+    }
+    return http.createServer(handler)
+  })
+  .catch((error: any) => {
+    process.exitCode = 1
+    prettyPrintError(error)
+  })

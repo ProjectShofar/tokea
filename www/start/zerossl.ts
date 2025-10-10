@@ -82,6 +82,7 @@ await new Promise(async resolve => {
     const validateID = data?.id
     
     const server = http.createServer((req, res) => {
+        console.log(`Request URL: ${req?.url}`)
         if (req?.url === validatePath) {
             res.end(validateContent)
         }
