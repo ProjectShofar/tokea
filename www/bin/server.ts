@@ -11,6 +11,9 @@
 
 import 'reflect-metadata'
 import { Ignitor, prettyPrintError } from '@adonisjs/core'
+import fs from 'fs'
+import path from 'path'
+import https from 'https'
 
 /**
  * URL to the application root. AdonisJS need it to resolve
@@ -29,17 +32,49 @@ const IMPORTER = (filePath: string) => {
   return import(filePath)
 }
 
-new Ignitor(APP_ROOT, { importer: IMPORTER })
+const ignitor = new Ignitor(APP_ROOT, { importer: IMPORTER })
   .tap((app) => {
     app.booting(async () => {
       await import('#start/env')
+      if (process.env.ZEROSSL_API_KEY) {
+        await import('#start/zerossl')
+      }
     })
     app.listen('SIGTERM', () => app.terminate())
     app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
   })
-  .httpServer()
-  .start()
-  .catch((error) => {
-    process.exitCode = 1
-    prettyPrintError(error)
-  })
+
+const certPath = path.join(new URL('.', APP_ROOT).pathname, 'tmp', 'certificate.crt')
+const keyPath = path.join(new URL('.', APP_ROOT).pathname, 'tmp', 'private.key')
+const useHttps = process.env.ZEROSSL_API_KEY && fs.existsSync(certPath) && fs.existsSync(keyPath)
+
+if (process.env.ZEROSSL_API_KEY && !useHttps) {
+  throw new Error('SSL certificate application failed. If you want to run it under http, please remove ZEROSSL_API_KEY. Please note: running it under http will cause security issues and your content may be stolen by a man-in-the-middle.')
+}
+
+if (useHttps) {
+  console.log('Using HTTPS with ZeroSSL certificate')
+  ignitor
+    .httpServer()
+    .start((handler) => {
+      return https.createServer(
+        {
+          cert: fs.readFileSync(certPath, 'utf-8'),
+          key: fs.readFileSync(keyPath, 'utf-8'),
+        },
+        handler
+      )
+    })
+    .catch((error: any) => {
+      process.exitCode = 1
+      prettyPrintError(error)
+    })
+} else {
+  ignitor
+    .httpServer()
+    .start()
+    .catch((error: any) => {
+      process.exitCode = 1
+      prettyPrintError(error)
+    })
+}

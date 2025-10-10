@@ -1,4 +1,3 @@
-import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { defineConfig, store, drivers } from '@adonisjs/cache'
 
