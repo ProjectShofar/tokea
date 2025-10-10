@@ -5,7 +5,7 @@ import fs from 'fs'
 import app from '@adonisjs/core/services/app'
 
 const cancelCertificates = async () => {
-    await new Promise(async resolve => {
+    try {
         const { data: certificates } = await axios.get(`https://api.zerossl.com/certificates?access_key=${process.env.ZEROSSL_API_KEY}`)
         for (const certificate of certificates?.results || []) {
             if (certificate.status === 'draft') {
@@ -15,8 +15,9 @@ const cancelCertificates = async () => {
                 }
             }
         }
-        resolve(true)
-    })
+    } catch (e) {
+        console.log(e.response.data)
+    }
 }
 
 const validateCertificate = async (validateID: string, retires = 0) => {
@@ -27,10 +28,10 @@ const validateCertificate = async (validateID: string, retires = 0) => {
         })
         console.log(challengeData)
     } catch (e) {
-        console.log(e.response.data)
         if (retires < 3) {
-            await validateCertificate(validateID, retires + 1)
+            return await validateCertificate(validateID, retires + 1)
         }
+        throw e.response.data
     }
 }
 
@@ -38,13 +39,12 @@ const getCertificate = async (validateID: string) => {
     while (true) {
         try {
             const { data: certificateData } = await axios.get(`https://api.zerossl.com/certificates/${validateID}?access_key=${process.env.ZEROSSL_API_KEY}`)
-            if (certificateData?.status !== 'draft') {
+            if (certificateData?.status !== 'issued') {
                 await new Promise(resolve => setTimeout(resolve, 1000))
                 continue;
             }
             break;
         } catch (e) {
-            console.log(e.response.data)
             await new Promise(resolve => setTimeout(resolve, 1000))
             continue;
         }
@@ -73,6 +73,7 @@ await new Promise(async resolve => {
     })
     
     const validateURL = data?.validation?.other_methods?.[ipv4]?.file_validation_url_http
+    console.log(`Validate URL: ${validateURL}`)
     if (!validateURL) {
         throw new Error('Validation url not found')
     }
