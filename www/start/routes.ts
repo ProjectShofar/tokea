@@ -12,6 +12,9 @@ import TemplatesController from '#controllers/templates_controller'
 import router from '@adonisjs/core/services/router'
 import UsersController from '#controllers/users_controller'
 import { middleware } from './kernel.js'
+import ZerosslsController from '#controllers/zerossls_controller'
+import fs from 'fs'
+import app from '@adonisjs/core/services/app'
 
 
 router.group(() => {
@@ -27,6 +30,9 @@ router.group(() => {
   router.post('/users', [UsersController, 'addUsers'])
   router.get ('/users', [UsersController, 'getUsers'])
   router.delete('/users/:id', [UsersController, 'deleteUser'])
+  if (!fs.existsSync(app.makePath('tmp/certificate.crt'))) {
+    router.post('/zerossl/init', [ZerosslsController, 'init'])
+  }
 
   // router.get ('/subscription/:uuid', [UsersController, 'getSubscription'])
 }).use([

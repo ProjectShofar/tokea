@@ -37,9 +37,6 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
   .tap((app) => {
     app.booting(async () => {
       await import('#start/env')
-      if (process.env.ZEROSSL_API_KEY) {
-        await import('#start/zerossl')
-      }
     })
     app.listen('SIGTERM', () => app.terminate())
     app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())
@@ -48,7 +45,7 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
   .start((handler) => {
     const certPath = path.join(new URL('.', APP_ROOT).pathname, 'tmp', 'certificate.crt')
     const keyPath = path.join(new URL('.', APP_ROOT).pathname, 'tmp', 'private.key')
-    const useHttps = process.env.ZEROSSL_API_KEY && fs.existsSync(certPath) && fs.existsSync(keyPath)
+    const useHttps = fs.existsSync(certPath) && fs.existsSync(keyPath)
     if (useHttps) {
       return https.createServer(
         {
@@ -57,9 +54,6 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
         },
         handler
       )
-    }
-    if (process.env.ZEROSSL_API_KEY && !useHttps) {
-      throw new Error('SSL certificate application failed. If you want to run it under http, please remove ZEROSSL_API_KEY. Please note: running it under http will cause security issues and your content may be stolen by a man-in-the-middle.')
     }
     return http.createServer(handler)
   })

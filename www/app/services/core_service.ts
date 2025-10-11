@@ -53,7 +53,6 @@ export default class CoreService {
             process.kill(pid, 0)
             return true
         } catch (e) {
-            console.log(e.code)
             if (e.code === 'ESRCH') {
                 return false
             }

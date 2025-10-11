@@ -2,7 +2,6 @@ import app from '@adonisjs/core/services/app'
 import { Server } from 'socket.io'
 import server from '@adonisjs/core/services/server'
 import WebSocket from 'ws'
-import logger from '@adonisjs/core/services/logger'
 import cache from '@adonisjs/cache/services/main'
 
 function connectWebSocket(url: string, onMessage: (data: any) => void) {
@@ -12,8 +11,8 @@ function connectWebSocket(url: string, onMessage: (data: any) => void) {
   ws.on('message', (data) => {
     onMessage(data.toString())
   })
-  ws.on('error', (error) => {
-    logger.error(error.message)
+  ws.on('error', () => {
+    // logger.error(error.message)
   })
   ws.on('close', async () => {
     await new Promise(resolve => setTimeout(resolve, 1000))
