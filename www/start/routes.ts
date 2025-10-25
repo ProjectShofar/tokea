@@ -30,6 +30,7 @@ router.group(() => {
   router.post('/users', [UsersController, 'addUsers'])
   router.get ('/users', [UsersController, 'getUsers'])
   router.delete('/users/:id', [UsersController, 'deleteUser'])
+  router.get ('/subscribe/:uuid', [UsersController, 'getSubscribe'])
   if (!fs.existsSync(app.makePath('tmp/certificate.crt'))) {
     router.post('/zerossl/init', [ZerosslsController, 'init'])
   }

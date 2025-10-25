@@ -11,7 +11,7 @@ export function StatusCard() {
     })
     const [traffic, setTraffic] = useState(0)
     useEffect(() => {
-        const socket = io(`ws://localhost:4444`)
+        const socket = io(import.meta.env.DEV ? `ws://localhost:4444` : window.location.protocol === 'https:' ? `wss://${window.location.host}` : `ws://${window.location.host}`)
         socket.on('speed', (data) => {
             setSpeed(data)
         })

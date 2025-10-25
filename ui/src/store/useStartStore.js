@@ -5,7 +5,7 @@ import { immer } from "zustand/middleware/immer";
 export const useStartStore = create(
   immer((set) => ({
     type: 'newbie',
-    step: 'select-user-type',
+    step: 'zerossl',
     templateType: undefined,
     setType: (type) =>
       set((state) => {

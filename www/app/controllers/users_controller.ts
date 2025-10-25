@@ -6,6 +6,8 @@ import CoreService from '#services/core_service'
 // import Setting from '#models/setting'
 // import TemplateService from '#services/template_service'
 import { inject } from '@adonisjs/core/container'
+import TemplateService from '#services/template_service'
+import Setting from '#models/setting'
 @inject()
 export default class UsersController {
     constructor(private coreService: CoreService) {}
@@ -36,10 +38,12 @@ export default class UsersController {
         return user
     }
 
-    // async getSubscription({ params }: HttpContext) {
-    //     const user = await User.query().where('uuid', params.uuid).firstOrFail()
-    //     const inbound = (await Setting.query().where('key', 'inbounds').first())?.value?.[0]
-    //     const template = await new TemplateService(inbound?.type).getInstance()
-    //     return await template.config(user.uuid)
-    // }
+    async getSubscribe(ctx: HttpContext) {
+        const user = await User.query().where('uuid', ctx.params.uuid).firstOrFail()
+        if (!user) {
+            return ctx.response.status(404)
+        }
+        const template = new TemplateService((await Setting.query().where('key', 'template').first())?.value)
+        return await template.buildSubscribe(user)
+    }
 }

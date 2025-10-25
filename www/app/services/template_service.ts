@@ -8,6 +8,8 @@ import { Template } from '../../types.js'
 import { randomUUID } from 'crypto'
 import User from '#models/user'
 import logger from '@adonisjs/core/services/logger'
+import fs from 'fs'
+import { HttpContext } from '@adonisjs/core/http'
 export default class TemplateService {
     templateName: string
     template: Template
@@ -130,6 +132,24 @@ export default class TemplateService {
             name: user.username,
             uuid: user.uuid
           }))
+      }
+    }
+
+    async buildSubscribe(user: User) {
+      const ctx = HttpContext.getOrFail()
+      const files = fs.readdirSync(app.makePath('app/subscribes'), { withFileTypes: true }).filter(file => file.isFile())
+      for (const file of files) {
+        if (!(file.name.endsWith('.ts') || file.name.endsWith('.js'))) {
+          continue
+        }
+        const subscribe = await import(app.makePath(`app/subscribes/${file.name}`))
+        if (subscribe.default) {
+          const instance = new subscribe.default(this.template, user)
+          if (!ctx.request.header('User-Agent')?.toString().includes(instance.ua)) {
+            continue
+          }
+          return await instance.handle()
+        }
       }
     }
 }

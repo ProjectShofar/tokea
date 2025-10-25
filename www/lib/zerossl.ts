@@ -71,7 +71,11 @@ export default class Zerossl {
     }
 
     async init() {
-        await new Promise(async resolve => {
+        return await new Promise(async (resolve, reject) => {
+            if (!this.key) {
+                reject(new Error('ZeroSSL API key not found'))
+                return
+            }
             const ipv4 = await getIPv4()
             if (!ipv4) {
                 throw new Error('IPv4 not found')
@@ -83,18 +87,27 @@ export default class Zerossl {
             }
             const csr = await createCSR(ipv4)
             if (!csr) {
-                throw new Error('CSR not found')
+                reject(new Error('CSR not found'))
+                return
             }
             
-            const { data } = await axios.post(`https://api.zerossl.com/certificates?access_key=${this.key}`, {
-                certificate_domains: ipv4,
-                certificate_csr: csr
-            })
+            let data
+            try {
+                const response = await axios.post(`https://api.zerossl.com/certificates?access_key=${this.key}`, {
+                    certificate_domains: ipv4,
+                    certificate_csr: csr
+                })
+                data = response.data
+            } catch (e) {
+                reject(new Error(e.response.data?.type))
+                return
+            }
             
             const validateURL = data?.validation?.other_methods?.[ipv4]?.file_validation_url_http
             console.log(`Validate URL: ${validateURL}`)
             if (!validateURL) {
-                throw new Error('Validation url not found')
+                reject(new Error('Validation url not found'))
+                return
             }
             const validatePath = new URL(validateURL).pathname
             const validateContent = data?.validation?.other_methods?.[ipv4]?.file_validation_content?.join('\n')

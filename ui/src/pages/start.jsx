@@ -5,14 +5,20 @@ import {ForExpert} from './start/for-expert'
 import { useGetConfigs } from '../apis/config'
 import { Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { ZeroSSL } from './start/zerossl'
 export default function Start()
 {
     const { step, setStep } = useStartStore()
     const { data: config } = useGetConfigs()
     useEffect(() => {
+        if (window.location.protocol === 'http:') {
+            setStep('zerossl')
+            return
+        }
         setStep('select-user-type')
     }, [])
     const steps = {
+        'zerossl': <ZeroSSL />,
         'select-user-type': <SelectUserType />,
         'for-newbie': <ForNewbie />,
         'for-expert': <ForExpert />,
