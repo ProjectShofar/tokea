@@ -135,6 +135,19 @@ export default class TemplateService {
       }
     }
 
+    async buildServerTLS() {
+      if (this.template.server.tls?.enabled) {
+        return {
+          enabled: true,
+          server_name: await this.getIPv4(),
+          certificate: fs.readFileSync(app.makePath('tmp/certificate.crt'), 'utf-8').split('\n'),
+        }
+      }
+      return {
+        enabled: false
+      }
+    }
+
     async buildSubscribe(user: User) {
       const ctx = HttpContext.getOrFail()
       const files = fs.readdirSync(app.makePath('app/subscribes'), { withFileTypes: true }).filter(file => file.isFile())
@@ -145,7 +158,7 @@ export default class TemplateService {
         const subscribe = await import(app.makePath(`app/subscribes/${file.name}`))
         if (subscribe.default) {
           const instance = new subscribe.default(this.template, user)
-          if (!ctx.request.header('User-Agent')?.toString().includes(instance.ua)) {
+          if (!ctx.request.header('User-Agent')?.toString()?.toLowerCase().includes(instance.ua)) {
             continue
           }
           return await instance.handle()

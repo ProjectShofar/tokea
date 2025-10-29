@@ -29,12 +29,15 @@ export default class CoreService {
     async refresh() {
         const server = (await Setting.query().where('key', 'server').first())?.value
         const template = (await Setting.query().where('key', 'template').first())?.value
-        const users = await new TemplateService(template).buildUsers()
+        const templateService = new TemplateService(template)
+        const users = await templateService.buildUsers()
+        const tls = await templateService.buildServerTLS()
         const config = {
             inbounds: [
                 {
                     ...server,
                     users,
+                    tls
                 }
             ],
             experimental: {
